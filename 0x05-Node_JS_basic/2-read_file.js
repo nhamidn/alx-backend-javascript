@@ -4,40 +4,41 @@ function countStudents(path) {
   if (!fs.existsSync(path)) {
     throw new Error('Cannot load the database');
   }
+
   if (!fs.statSync(path).isFile()) {
     throw new Error('Cannot load the database');
   }
+  try {
+    const data = fs.readFileSync(path, 'utf8');
+    const lines = data.trim().split('\n');
+    const headers = lines[0].split(',');
 
-  const lines = fs.readFileSync(path, 'utf8')
-    .toString('utf-8')
-    .trim()
-    .split('\n')
-    .filter((line) => line.trim() !== '');
+    const students = lines.slice(1).map((line) => {
+      const values = line.split(',');
+      const studentObj = {};
+      headers.forEach((header, index) => {
+        studentObj[header] = values[index];
+      });
+      return studentObj;
+    });
 
-  const headers = lines[0].split(',');
-  const studentGroups = {};
-
-  lines.slice(1).forEach((line) => {
-    const studentData = line.split(',');
-    const field = studentData.pop();
-    const student = headers.slice(0, -1).reduce((newObj, header, index) => ({
-      ...newObj,
-      [header]: studentData[index],
-    }), {});
-
-    if (!studentGroups[field]) {
-      studentGroups[field] = [];
-    }
-    studentGroups[field].push(student);
-  });
-
-  const totalStudents = Object.values(studentGroups).reduce((acc, cur) => acc + cur.length, 0);
-  console.log(`Number of students: ${totalStudents}`);
-
-  Object.entries(studentGroups).forEach(([field, students]) => {
-    const names = students.map((student) => student.firstname).join(', ');
-    console.log(`Number of students in ${field}: ${students.length}. List: ${names}`);
-  });
+    const groupedByField = {};
+    students.forEach((student) => {
+      if (!groupedByField[student.field]) {
+        groupedByField[student.field] = [];
+      }
+      groupedByField[student.field].push(student);
+    });
+    console.log(`Number of students: ${students.length}`);
+    Object.keys(groupedByField).forEach((field) => {
+      const names = groupedByField[field].map((student) => student.firstname);
+      console.log(`Number of students in ${field}:`,
+        `${groupedByField[field].length}.`,
+        'List:',
+        names.join(', '));
+    });
+  } catch (err) {
+    throw new Error('Cannot load the database');
+  }
 }
-
 module.exports = countStudents;
