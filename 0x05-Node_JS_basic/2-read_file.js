@@ -37,4 +37,5 @@ function countStudents(path) {
       names.join(', '));
   });
 }
+
 module.exports = countStudents;
