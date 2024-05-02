@@ -55,7 +55,7 @@ const app = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/plain' });
       res.end(`This is the list of our students\n${data}`);
     }).catch((err) => {
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
       res.end(err.message);
     });
   }
