@@ -1,14 +1,13 @@
 import express from 'express';
-import routes from './routes/index.js';
+import mapRoutes from './routes';
 
 const app = express();
-app.locals.dbPath = process.argv[2];
-
-app.use('/', routes);
-
 const PORT = 1245;
+
+mapRoutes(app);
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server listening on PORT ${PORT}`);
 });
 
 export default app;
+module.exports = app;
